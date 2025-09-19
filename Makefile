@@ -29,13 +29,16 @@ test: build
 	$(DOCKER_RUN) uv run pytest
 
 
-migrations: build
-	$(DOCKER_RUN) uv run alembic revision --autogenerate
+migrations: 
+#           build
+	$(DOCKER_RUN) uv run manage.py makemigrations
+# 	uv run manage.py makemigrations
 	
 migrate:
-	$(DOCKER_RUN) uv run alembic upgrade head
+	$(DOCKER_RUN) uv run manage.py migrate
+# 	uv run manage.py migrate
 
-auto_migrate: migrations migrate
+automigrate: migrations migrate
 
 shema:
 	uv run manage.py spectacular --color --file schema.yml
