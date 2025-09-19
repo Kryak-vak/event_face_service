@@ -30,7 +30,7 @@ class Event(models.Model):
         editable=False
     )
     name = models.CharField("Название", max_length=255)
-    event_time = models.DateTimeField("Дата проведения мероприятия")
+    date = models.DateTimeField("Дата проведения мероприятия")
     status = models.CharField(
         "Текущий статус",
         max_length=6,
@@ -50,4 +50,4 @@ class Event(models.Model):
         verbose_name_plural = "Мероприятия"
 
     def __str__(self):
-        return f"{self.name} ({self.event_time.date()})"
+        return f"{self.name} ({self.date.date()})"

@@ -18,10 +18,13 @@ Including another URLconf
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import path
+from django.urls import include, path
+
+api_v1_str = "api"
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path(f"{api_v1_str}/events/", include("events.urls"), name="events"),
 ]
 
 if settings.DEBUG:

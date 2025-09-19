@@ -31,8 +31,8 @@ test: build
 
 migrations: 
 #           build
-	$(DOCKER_RUN) uv run manage.py makemigrations
-# 	uv run manage.py makemigrations
+# 	$(DOCKER_RUN) uv run manage.py makemigrations
+	uv run manage.py makemigrations
 	
 migrate:
 	$(DOCKER_RUN) uv run manage.py migrate
