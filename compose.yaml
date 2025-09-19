@@ -1,0 +1,56 @@
+services:
+    web:
+        build: .
+        container_name: event_face-web-1
+
+        # volumes:
+        #     - ./.env:/app/.env
+
+        ports:
+            - "8000:8000"
+
+        env_file:
+            - ./.env
+
+        develop:
+            # Create a `watch` configuration to update the app
+            watch:
+                # Sync the working directory with the `/app` directory in the container
+                - action: sync
+                  path: ./src
+                  target: /app/src/
+                  ignore:
+                      - .venv/
+
+                # Rebuild the image if dependencies change by checking uv.lock
+                - action: rebuild
+                  path: ./uv.lock
+        
+        depends_on:
+            - db
+
+    db:
+        image: postgres:17-alpine
+        container_name: event_face-db-1
+        
+        environment:
+            POSTGRES_USER: ${DB_USER}
+            POSTGRES_PASSWORD: ${DB_PASSWORD}
+            POSTGRES_DB: ${DB_NAME}
+
+        env_file:
+            - ./.env
+
+        volumes:
+            - postgres-data_event_face:/var/lib/postgresql/data
+
+        ports:
+            - "${DB_PORT}:5432"
+
+        restart: always
+        
+        logging:
+            driver: "none"
+
+volumes:
+    postgres-data_event_face:
