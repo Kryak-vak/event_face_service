@@ -16,16 +16,32 @@ Including another URLconf
 """
 
 from django.conf import settings
-from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework.reverse import reverse
+
+
+@api_view(["GET"])
+def api_root(request, format=None):
+    return Response({
+        "events": reverse("events-list", request=request, format=format),
+    })
+
 
 api_v1_str = "api"
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path(f"{api_v1_str}/", api_root, name="api-root"),
     path(f"{api_v1_str}/events/", include("events.urls"), name="events"),
 ]
 
 if settings.DEBUG:
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+    urlpatterns += staticfiles_urlpatterns()
+
+
+admin.site.site_header = 'Панель администрирования event-face'
+admin.site.site_title = 'EventFace'

@@ -15,6 +15,6 @@ class EventListView(generics.ListAPIView):
 
     def get_queryset(self) -> QuerySet[Event]:
         return (
-            Event.objects.filter(status="open")
+            Event.objects.filter(status=Event.Status.OPEN)
             .select_related("venue")
         )

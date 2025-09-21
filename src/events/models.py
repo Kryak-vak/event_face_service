@@ -9,7 +9,7 @@ class Venue(models.Model):
         default=uuid4,
         editable=False
     )
-    name = models.CharField("Название", max_length=255)
+    name = models.CharField("Название", max_length=255, unique=True)
 
     class Meta:
         verbose_name = "Площадка"
