@@ -26,6 +26,10 @@ from rest_framework.reverse import reverse
 @api_view(["GET"])
 def api_root(request, format=None):
     return Response({
+        "register": reverse("register", request=request, format=format),
+        "login": reverse("login", request=request, format=format),
+        "logout": reverse("token_blacklist", request=request, format=format),
+        "token_refresh": reverse("token_refresh", request=request, format=format),
         "events": reverse("events-list", request=request, format=format),
     })
 
@@ -35,6 +39,7 @@ api_v1_str = "api"
 urlpatterns = [
     path("admin/", admin.site.urls),
     path(f"{api_v1_str}/", api_root, name="api-root"),
+    path(f"{api_v1_str}/auth/", include("auth.urls"), name="auth"),
     path(f"{api_v1_str}/events/", include("events.urls"), name="events"),
 ]
 

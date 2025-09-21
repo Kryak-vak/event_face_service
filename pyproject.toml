@@ -9,6 +9,7 @@ dependencies = [
     "django-extensions>=4.1",
     "django-filter>=25.1",
     "djangorestframework>=3.16.1",
+    "djangorestframework-simplejwt>=5.5.1",
     "drf-spectacular>=0.28.0",
     "markdown>=3.9",
     "psycopg2>=2.9.10",
@@ -22,6 +23,7 @@ dev = [
     "djangorestframework-stubs>=3.16.3",
     "mypy>=1.18.2",
     "mypy-extensions>=1.1.0",
+    "python-dotenv>=1.1.1",
     "ruff>=0.13.1",
 ]
 

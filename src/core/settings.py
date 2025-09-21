@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+from datetime import timedelta
 from pathlib import Path
 
 import environ
@@ -19,6 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 env = environ.Env()
 environ.Env.read_env(env_file=BASE_DIR.parent / ".env")
+environ.Env.read_env(env_file=BASE_DIR.parent / ".env.local")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -41,6 +43,7 @@ PROJECT_APPS = [
 THIRD_PARTY_APPS = [
     "django_extensions",
     "rest_framework",
+    'rest_framework_simplejwt.token_blacklist',
     "drf_spectacular",
 ]
 
@@ -152,15 +155,30 @@ MEDIA_ROOT = "media/"
 MEDIA_URL = "media/"
 
 
-# SPECTACULAR
+# REST_FRAMEWORK
 
 REST_FRAMEWORK = {
     "DEFAULT_RENDERER_CLASSES": [
         "rest_framework.renderers.JSONRenderer",
         "rest_framework.renderers.BrowsableAPIRenderer",
     ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
+
+
+# SIMPLE_JWT
+
+SIMPLE_JWT = {
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=15),
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': True,
+}
+
+
+# SPECTACULAR_SETTINGS
 
 SPECTACULAR_SETTINGS = {
     "TITLE": "event-face API",
