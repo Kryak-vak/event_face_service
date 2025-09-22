@@ -53,7 +53,7 @@ class Event(models.Model):
     )
     
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True) 
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ["-date"]
@@ -62,3 +62,41 @@ class Event(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.date.date()})"
+
+
+class EventRegistration(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    event = models.ForeignKey(
+        "Event", on_delete=models.CASCADE, related_name="registrations"
+    )
+    
+    fullname = models.CharField(max_length=128)
+    email = models.EmailField()
+    confirmation_code = models.CharField(max_length=32)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ("event", "email")
+        verbose_name = "Регистрация на мероприятие"
+        verbose_name_plural = "Регистрации на мероприятия"
+
+    def __str__(self):
+        return f"{self.fullname} ({self.email}) -> {self.event.name}"
+
+
+class OutboxMessage(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    
+    topic = models.CharField(max_length=255)
+    payload = models.JSONField()
+    
+    sent = models.BooleanField(default=False)
+    sent_at = models.DateTimeField(null=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.topic} - sent: {self.sent}"
+

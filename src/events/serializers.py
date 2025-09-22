@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Event
+from .models import Event, EventRegistration
 
 
 class EventSerializer(serializers.ModelSerializer):
@@ -9,3 +9,8 @@ class EventSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
         fields = "__all__"
+
+
+class EventRegistrationSerializer(serializers.Serializer):
+    full_name = serializers.CharField(max_length=128)
+    email = serializers.EmailField()

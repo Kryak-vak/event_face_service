@@ -3,14 +3,13 @@ from datetime import date
 from urllib.parse import urlencode
 
 import httpx
+from django.conf import settings
 from django.db import transaction
 from django.utils.dateparse import parse_datetime
 
 from events.models import Event, Venue
 
 logger = logging.getLogger(__name__)
-
-PROVIDER_URL = "https://events.k3scluster.tech/api/events/"
 
 
 def create_or_update_venue(venue_data: dict) -> Venue | None:
@@ -54,7 +53,7 @@ def create_or_update_event(
 
 
 def sync_events(
-        provider_url: str = PROVIDER_URL,
+        provider_url: str = settings.PROVIDER_API_URL,
         from_date: date | None = None,
         sync_all: bool = False
     ):
