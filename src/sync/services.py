@@ -43,7 +43,7 @@ def sync_events(
             created_total += created_batch
             updated_total += updated_batch
 
-            cursor = parse_qs(urlparse(url).query).get('cursor', "")
+            cursor = parse_qs(urlparse(url).query).get("cursor", "")
             logger.info(
                 f"Synced batch ({cursor=}): {created_batch} created, {updated_batch} updated"
             )
