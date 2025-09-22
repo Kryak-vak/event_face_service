@@ -9,7 +9,12 @@ class Venue(models.Model):
         default=uuid4,
         editable=False
     )
+    provider_id = models.UUIDField(unique=True, null=True, blank=True)
+    
     name = models.CharField("Название", max_length=255, unique=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True) 
 
     class Meta:
         verbose_name = "Площадка"
@@ -29,6 +34,8 @@ class Event(models.Model):
         default=uuid4,
         editable=False
     )
+    provider_id = models.UUIDField(unique=True, null=True, blank=True)
+
     name = models.CharField("Название", max_length=255)
     date = models.DateTimeField("Дата проведения мероприятия")
     status = models.CharField(
@@ -44,8 +51,12 @@ class Event(models.Model):
         blank=True,
         verbose_name="Площадка"
     )
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True) 
 
     class Meta:
+        ordering = ["-date"]
         verbose_name = "Мероприятие"
         verbose_name_plural = "Мероприятия"
 

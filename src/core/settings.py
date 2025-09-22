@@ -37,7 +37,9 @@ ALLOWED_HOSTS = []
 # Application definition
 
 PROJECT_APPS = [
-    "src.events",
+    "events",
+    "auth_jwt",
+    "sync",
 ]
 
 THIRD_PARTY_APPS = [
@@ -164,6 +166,12 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
+        
+        *(
+            ["rest_framework.authentication.SessionAuthentication"]
+            if DEBUG
+            else []
+        ),
     ],
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }

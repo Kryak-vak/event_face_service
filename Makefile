@@ -32,6 +32,7 @@ test: build
 migrations: 
 #           build
 # 	$(DOCKER_RUN) uv run manage.py makemigrations
+	$env:PYTHONPATH = "./src"
 	uv run manage.py makemigrations
 	
 migrate:
