@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 def process_outbox(batch_size=100, sleep_seconds=1):
     headers = {
-        "Content-type": "application/json",
+        "Content-Type": "application/json",
         "owner_id": settings.OWNER_ID
     }
 

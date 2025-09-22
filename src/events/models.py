@@ -14,7 +14,7 @@ class Venue(models.Model):
     name = models.CharField("Название", max_length=255, unique=True)
     
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True) 
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         verbose_name = "Площадка"
@@ -36,8 +36,8 @@ class Event(models.Model):
     )
     provider_id = models.UUIDField(unique=True, null=True, blank=True)
 
-    name = models.CharField("Название", max_length=255)
-    date = models.DateTimeField("Дата проведения мероприятия")
+    name = models.CharField("Название", max_length=255, db_index=True)
+    date = models.DateTimeField("Дата проведения мероприятия", db_index=True)
     status = models.CharField(
         "Текущий статус",
         max_length=6,
@@ -46,9 +46,7 @@ class Event(models.Model):
     )
     venue = models.ForeignKey(
         Venue,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
+        on_delete=models.CASCADE,
         verbose_name="Площадка"
     )
     

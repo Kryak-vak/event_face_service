@@ -4,7 +4,7 @@ from httpx import Client
 def make_register_request(client: Client, username: str, password: str):
     url = "http://127.0.0.1:8000/api/auth/register/"
     headers = {
-        "Content-type": "application/json"
+        "Content-Type": "application/json"
     }
     data = {
         "username": username,
@@ -19,7 +19,7 @@ def make_register_request(client: Client, username: str, password: str):
 def make_login_request(client: Client, username: str, password: str):
     url = "http://127.0.0.1:8000/api/auth/login/"
     headers = {
-        "Content-type": "application/json"
+        "Content-Type": "application/json"
     }
     data = {
         "username": username,
@@ -34,7 +34,7 @@ def make_login_request(client: Client, username: str, password: str):
 def make_logout_request(client: Client, refresh_token: str):
     url = "http://127.0.0.1:8000/api/auth/logout/"
     headers = {
-        "Content-type": "application/json"
+        "Content-Type": "application/json"
     }
     data = {
         "refresh": refresh_token
@@ -48,7 +48,7 @@ def make_logout_request(client: Client, refresh_token: str):
 def make_token_refresh_request(client: Client, refresh_token: str):
     url = "http://127.0.0.1:8000/api/auth/token/refresh/"
     headers = {
-        "Content-type": "application/json"
+        "Content-Type": "application/json"
     }
     data = {
         "refresh": refresh_token
@@ -62,7 +62,7 @@ def make_token_refresh_request(client: Client, refresh_token: str):
 def make_events_request(client: Client, access_token: str | None = None):
     url = "http://127.0.0.1:8000/api/events/"
     headers = {
-        "Content-type": "application/json"
+        "Content-Type": "application/json"
     }
     if access_token:
         headers["Authorization"] = f"Bearer {access_token}"

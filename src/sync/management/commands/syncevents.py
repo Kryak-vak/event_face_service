@@ -2,8 +2,8 @@ from datetime import date
 
 from django.core.management.base import BaseCommand
 
-from src.sync.models import SyncLog
-from src.sync.services import sync_events
+from sync.models import SyncLog
+from sync.services import sync_events
 
 
 class Command(BaseCommand):
@@ -16,9 +16,11 @@ class Command(BaseCommand):
                             help="Sync events changed since this date (YYYY-MM-DD)")
 
     def handle(self, *args, **options):
-        added, updated = sync_events(from_date=options["date"], sync_all=options["all"])
+        created, updated = sync_events(
+            from_date=options["date"], sync_all=options["all"]
+        )
 
-        SyncLog.objects.create(added_count=added, updated_count=updated)
+        SyncLog.objects.create(created_count=created, updated_count=updated)
         self.stdout.write(
-            self.style.SUCCESS(f"Sync done: {added} added, {updated} updated")
+            self.style.SUCCESS(f"Sync done: {created} created, {updated} updated")
         )
