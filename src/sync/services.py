@@ -23,7 +23,7 @@ def sync_events(
         provider_url: str = settings.EVENT_PROVIDER_API_URL,
         from_date: date | None = None,
         sync_all: bool = False
-    ):
+    ) -> tuple[int, int, int]:
     
     if not from_date and not sync_all:
         last_updated_event = Event.objects.order_by("updated_at").last()
@@ -34,18 +34,22 @@ def sync_events(
     if not sync_all and from_date:
         url += "?" + urlencode({"changed_at": from_date})
     
-    created_total, updated_total = 0, 0
+    created_total, updated_total, failed_total = 0, 0, 0
     venue_cache = {}
     with EventApiClient() as client:
         while True:
             next_batch_url, events = fetch_event_batch(url, client)
-            created_batch, updated_batch = create_event_batch(events, venue_cache)
-            created_total += created_batch
-            updated_total += updated_batch
+            created, updated, failed = create_event_batch(
+                events, venue_cache
+            )
+            created_total += created
+            updated_total += updated
+            failed_total += failed
 
             cursor = parse_qs(urlparse(url).query).get("cursor", "")
             logger.info(
-                f"Synced batch ({cursor=}): {created_batch} created, {updated_batch} updated"
+                f"Synced batch ({cursor=}): "
+                f"{created} created, {updated} updated, {failed} failed"
             )
 
             if not next_batch_url:
@@ -53,7 +57,7 @@ def sync_events(
 
             url = next_batch_url
 
-    return created_total, updated_total
+    return created_total, updated_total, failed_total
 
 
 @retry(
@@ -74,8 +78,8 @@ def fetch_event_batch(batch_url: str, client: EventApiClient) -> tuple[str, list
 
 def create_event_batch(
         events: list[dict], venue_cache: dict[str, Venue]
-    ) -> tuple[int, int]:
-    created, updated = 0, 0
+    ) -> tuple[int, int, int]:
+    created, updated, failed = 0, 0, 0
     for event in events:
         try:
             with transaction.atomic():
@@ -94,12 +98,14 @@ def create_event_batch(
                     updated += 1
         except KeyError as e:
             logger.error(f"Missing required key in event: {e}")
+            failed += 1
             continue
         except (IntegrityError, DatabaseError) as e:
             logger.exception(f"Database error while creating/updating event: {e}")
+            failed += 1
             continue
 
-    return created, updated
+    return created, updated, failed
 
 
 def create_or_update_venue(venue_data: dict) -> Venue:

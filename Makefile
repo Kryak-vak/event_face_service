@@ -29,15 +29,16 @@ test: build
 	$(DOCKER_RUN) uv run pytest
 
 
-migrations: 
-#           build
-# 	$(DOCKER_RUN) uv run manage.py makemigrations
-# 	$env:PYTHONPATH = "./src"
-	uv run manage.py makemigrations
+makemigrations: 
+	$(DOCKER_EXEC) web uv run manage.py makemigrations
+
+copy_migrations:
+	uv run scripts/copy_migrations.py
+
+migrations: makemigrations copy_migrations
 	
 migrate:
-	$(DOCKER_RUN) uv run manage.py migrate
-# 	uv run manage.py migrate
+	$(DOCKER_EXEC) uv run manage.py migrate
 
 automigrate: migrations migrate
 

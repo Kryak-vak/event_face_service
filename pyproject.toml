@@ -22,6 +22,7 @@ dev = [
     "black>=25.9.0",
     "django-stubs[mypy]>=5.2.5",
     "djangorestframework-stubs>=3.16.3",
+    "docker>=7.1.0",
     "mypy>=1.18.2",
     "mypy-extensions>=1.1.0",
     "python-dotenv>=1.1.1",

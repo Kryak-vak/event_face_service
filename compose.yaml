@@ -1,7 +1,7 @@
 services:
     web:
         build: .
-        container_name: event_face-web-1
+        container_name: ${WEB_CONTAINER_NAME}
 
         # volumes:
         #     - ./.env:/app/.env
@@ -31,7 +31,7 @@ services:
 
     db:
         image: postgres:17-alpine
-        container_name: event_face-db-1
+        container_name: ${DB_CONTAINER_NAME}
         
         environment:
             POSTGRES_USER: ${DB_USER}
