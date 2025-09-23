@@ -38,8 +38,8 @@ def register_event(event: Event, full_name: str, email: str) -> None:
             topic="event_registration_created",
             payload={
                 "message_id": str(message_id),
-                "registration_id": registration.id,
-                "event_id": registration.event.id,
+                "registration_id": str(registration.id),
+                "event_id": str(registration.event.id),
                 "full_name": registration.full_name,
                 "email": registration.email,
                 "email_message": f"Код подтверждения: {registration.confirmation_code}",

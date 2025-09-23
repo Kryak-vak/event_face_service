@@ -40,7 +40,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path(f"{api_v1_str}/", api_root, name="api-root"),
     path(f"{api_v1_str}/auth/", include("auth_jwt.urls"), name="auth_jwt"),
-    path(f"{api_v1_str}/events/", include("events.urls"), name="events"),
+    path(f"{api_v1_str}/events/", include("events.urls")),
 ]
 
 if settings.DEBUG:

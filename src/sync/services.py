@@ -8,6 +8,7 @@ from django.db import DatabaseError, IntegrityError, transaction
 from django.utils.dateparse import parse_datetime
 from httpx import HTTPStatusError, RequestError
 from tenacity import (
+    RetryError,
     retry,
     retry_if_exception_type,
     stop_after_attempt,
@@ -47,7 +48,7 @@ def sync_events(
         while True:
             try:
                 next_batch_url, events = fetch_event_batch(url, client)
-            except (HTTPStatusError, RequestError) as e:
+            except (HTTPStatusError, RequestError, RetryError) as e:
                 logger.exception(
                     f"Unable to fetch events from events-provider url={url}: {e}"
                 )

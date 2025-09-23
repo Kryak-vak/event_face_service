@@ -6,6 +6,7 @@ from django.db import DatabaseError, transaction
 from django.utils import timezone
 from httpx import HTTPStatusError, RequestError
 from tenacity import (
+    RetryError,
     retry,
     retry_if_exception_type,
     stop_after_attempt,
@@ -18,7 +19,7 @@ from .models import OutboxMessage
 
 logger = logging.getLogger(__name__)
 
-def process_outbox(batch_size=100, sleep_seconds=1):
+def process_outbox(batch_size=100, sleep_seconds=5):
     while True:
         with transaction.atomic():
             messages = (OutboxMessage.objects
@@ -30,7 +31,7 @@ def process_outbox(batch_size=100, sleep_seconds=1):
                 for msg in messages:
                     try:
                         payload = {
-                            "id": msg.id,
+                            "id": str(msg.id),
                             "email": msg.payload["email"],
                             "message": msg.payload["email_message"],
                         }
@@ -40,7 +41,7 @@ def process_outbox(batch_size=100, sleep_seconds=1):
                         msg.sent = True
                         msg.sent_at = timezone.now()
                         msg.save()
-                    except (HTTPStatusError, RequestError) as e:
+                    except (HTTPStatusError, RequestError, RetryError) as e:
                         logger.exception(
                             f"Unable to send outbox message ({msg.id}): {e}"
                         )
@@ -66,4 +67,5 @@ def make_notification_request(
         json=payload,
         timeout=timeout
     )
+    print(f"{resp = }")
     resp.raise_for_status()
