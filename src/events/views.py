@@ -9,6 +9,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from .exceptions import AlreadyRegisteredError, EventClosedError
 from .models import Event
+from .pagination import EventPagination
 from .serializers import EventRegistrationSerializer, EventSerializer
 from .services import register_event
 
@@ -20,6 +21,7 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Event.objects.filter(status=Event.Status.OPEN).select_related("venue")
     serializer_class = EventSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = EventPagination
     authentication_classes = [JWTAuthentication] + (
         [SessionAuthentication] if settings.DEBUG else []
     )
