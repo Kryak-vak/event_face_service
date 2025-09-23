@@ -1,5 +1,6 @@
 import logging
 from datetime import date
+from enum import Enum
 from urllib.parse import parse_qs, urlencode, urlparse
 
 from django.conf import settings
@@ -17,6 +18,12 @@ from core.http_clients import EventApiClient
 from events.models import Event, Venue
 
 logger = logging.getLogger(__name__)
+
+
+class SyncResult(Enum):
+    CREATED = "created"
+    UPDATED = "updated"
+    UNCHANGED = "unchanged"
 
 
 def sync_events(
@@ -82,20 +89,22 @@ def create_event_batch(
     created, updated, failed = 0, 0, 0
     for event in events:
         try:
+            venue_data = event["place"]
+            venue_id = venue_data["id"]
+
             with transaction.atomic():
-                venue_data = event["place"]
-                venue_id = venue_data["id"]
                 if venue_id in venue_cache:
                     venue = venue_cache[venue_id]
                 else:
                     venue = create_or_update_venue(venue_data)
                     venue_cache[venue_id] = venue
 
-                _, is_created = create_or_update_event(event, venue)
-                if is_created:
-                    created += 1
-                else:
-                    updated += 1
+                _, sync_result = create_or_update_event(event, venue)
+            
+            if sync_result == SyncResult.CREATED:
+                created += 1
+            elif sync_result == SyncResult.UPDATED:
+                updated += 1
         except KeyError as e:
             logger.error(f"Missing required key in event: {e}")
             failed += 1
@@ -109,25 +118,57 @@ def create_event_batch(
 
 
 def create_or_update_venue(venue_data: dict) -> Venue:
-    venue, _ = Venue.objects.update_or_create(
-        provider_id=venue_data["id"],
-        defaults={
-            "name": venue_data["name"]
-        }
-    )
+    provider_id=venue_data["id"]
+    defaults={
+        "name": venue_data["name"]
+    }
+    
+    try:
+        venue = (
+            Venue.objects.get(provider_id=provider_id)
+        )
+        changed = False
+        for field, value in defaults.items():
+            if getattr(venue, field) != value:
+                setattr(venue, field, value)
+                changed = True
+        
+        if changed:
+            venue.save(update_fields=tuple(defaults.keys()))
+    except Venue.DoesNotExist:
+        venue = Venue.objects.create(provider_id=provider_id, **defaults)
     
     return venue
 
 
-def create_or_update_event(event_data: dict, venue: Venue) -> tuple[Event, bool]:
-    event, is_created = Event.objects.update_or_create(
-        provider_id=event_data["id"],
-        defaults={
-            "name": event_data["name"],
-            "date": parse_datetime(event_data["event_time"]),
-            "status": event_data["status"],
-            "venue": venue,
-        }
-    )
+def create_or_update_event(
+        event_data: dict, venue: Venue
+    ) -> tuple[Event, SyncResult]:
+    provider_id = event_data["id"]
+    defaults = {
+        "name": event_data["name"],
+        "date": parse_datetime(event_data["event_time"]),
+        "status": event_data["status"],
+        "venue": venue,
+    }
 
-    return event, is_created
+    try:
+        event = (
+            Event.objects
+            .select_related("venue")
+            .get(provider_id=provider_id)
+        )
+        changed = False
+        for field, value in defaults.items():
+            if getattr(event, field) != value:
+                setattr(event, field, value)
+                changed = True
+        
+        if changed:
+            event.save(update_fields=tuple(defaults.keys()))
+            return event, SyncResult.UPDATED
+        
+        return event, SyncResult.UNCHANGED
+    except Event.DoesNotExist:
+        event = Event.objects.create(provider_id=provider_id, **defaults)
+        return event, SyncResult.CREATED
