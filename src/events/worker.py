@@ -58,7 +58,9 @@ def process_outbox(batch_size=100, sleep_seconds=1):
     wait=wait_exponential(multiplier=1, min=1, max=10),
     retry=retry_if_exception_type((RequestError, HTTPStatusError))
 )
-def make_notification_request(client: EventApiClient, payload: dict, timeout: int = 10) -> None:
+def make_notification_request(
+    client: EventApiClient, payload: dict, timeout: int = 10
+) -> None:
     resp = client.post(
         settings.NOTIFICATIONS_API_URL,
         json=payload,
