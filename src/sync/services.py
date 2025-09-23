@@ -45,7 +45,14 @@ def sync_events(
     venue_cache = {}
     with EventApiClient() as client:
         while True:
-            next_batch_url, events = fetch_event_batch(url, client)
+            try:
+                next_batch_url, events = fetch_event_batch(url, client)
+            except (HTTPStatusError, RequestError) as e:
+                logger.exception(
+                    f"Unable to fetch events from events-provider url={url}: {e}"
+                )
+                raise
+            
             created, updated, failed = create_event_batch(
                 events, venue_cache
             )

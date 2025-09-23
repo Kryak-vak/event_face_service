@@ -68,9 +68,10 @@ class EventRegistration(models.Model):
         "Event", on_delete=models.CASCADE, related_name="registrations"
     )
     
-    fullname = models.CharField(max_length=128)
+    full_name = models.CharField(max_length=128)
     email = models.EmailField()
     confirmation_code = models.CharField(max_length=32)
+    confirmed = models.BooleanField(default=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -81,11 +82,11 @@ class EventRegistration(models.Model):
         verbose_name_plural = "Регистрации на мероприятия"
 
     def __str__(self):
-        return f"{self.fullname} ({self.email}) -> {self.event.name}"
+        return f"{self.full_name} ({self.email}) -> {self.event.name}"
 
 
 class OutboxMessage(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    id = models.UUIDField(primary_key=True, editable=False)
     
     topic = models.CharField(max_length=255)
     payload = models.JSONField()
