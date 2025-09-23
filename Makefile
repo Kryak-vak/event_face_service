@@ -2,6 +2,7 @@ SERVICE_NAME = web
 DOCKER_RUN = docker compose run $(SERVICE_NAME)
 DOCKER_EXEC = docker compose exec -it
 
+# 	$env:PYTHONPATH = "./src"
 
 build:
 	docker compose build
@@ -38,7 +39,7 @@ copy_migrations:
 migrations: makemigrations copy_migrations
 	
 migrate:
-	$(DOCKER_EXEC) uv run manage.py migrate
+	$(DOCKER_EXEC) web uv run manage.py migrate
 
 automigrate: migrations migrate
 
@@ -67,3 +68,7 @@ pip_fix:
 	.\backend\.venv\Scripts\python.exe -m ensurepip --upgrade
 	.\backend\.venv\Scripts\python.exe -m pip install --upgrade pip setuptools wheel
 
+
+
+syncevents:
+	$(DOCKER_EXEC) web uv run manage.py syncevents

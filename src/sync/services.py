@@ -71,7 +71,7 @@ def fetch_event_batch(batch_url: str, client: EventApiClient) -> tuple[str, list
     resp_json = resp.json()
 
     next_batch_url = resp_json["next"]
-    events = resp_json["result"]
+    events = resp_json["results"]
 
     return next_batch_url, events
 
@@ -124,7 +124,7 @@ def create_or_update_event(event_data: dict, venue: Venue) -> tuple[Event, bool]
         provider_id=event_data["id"],
         defaults={
             "name": event_data["name"],
-            "date": parse_datetime(event_data["date"]),
+            "date": parse_datetime(event_data["event_time"]),
             "status": event_data["status"],
             "venue": venue,
         }
