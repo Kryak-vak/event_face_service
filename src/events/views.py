@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.shortcuts import get_object_or_404
-from rest_framework import status, viewsets
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters, status, viewsets
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
@@ -8,6 +9,7 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from .exceptions import AlreadyRegisteredError, EventClosedError
+from .filters import EventFilter
 from .models import Event
 from .pagination import EventPagination
 from .serializers import EventRegistrationSerializer, EventSerializer
@@ -25,6 +27,11 @@ class EventViewSet(viewsets.ReadOnlyModelViewSet):
     authentication_classes = [JWTAuthentication] + (
         [SessionAuthentication] if settings.DEBUG else []
     )
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter, DjangoFilterBackend]
+    search_fields = ["name", "status"]
+    ordering_fields = ["event_time"]
+    filterset_fields = ["status"]
+    filterset_class = EventFilter
 
     @action(detail=True, methods=["post"], serializer_class=EventRegistrationSerializer)
     def register(self, request, pk=None):

@@ -155,7 +155,8 @@ def create_or_update_event(
     provider_id = event_data["id"]
     defaults = {
         "name": event_data["name"],
-        "date": parse_datetime(event_data["event_time"]),
+        "event_time": parse_datetime(event_data["event_time"]),
+        "registration_deadline": parse_datetime(event_data["registration_deadline"]),
         "status": event_data["status"],
         "venue": venue,
     }

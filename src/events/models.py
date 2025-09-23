@@ -37,7 +37,8 @@ class Event(models.Model):
     provider_id = models.UUIDField(unique=True, null=True, blank=True)
 
     name = models.CharField("Название", max_length=255, db_index=True)
-    date = models.DateTimeField("Дата проведения мероприятия", db_index=True)
+    event_time = models.DateTimeField("Дата проведения мероприятия", db_index=True)
+    registration_deadline = models.DateTimeField(db_index=True)
     status = models.CharField(
         "Текущий статус",
         max_length=6,
@@ -54,12 +55,12 @@ class Event(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ["-date"]
+        ordering = ["-event_time"]
         verbose_name = "Мероприятие"
         verbose_name_plural = "Мероприятия"
 
     def __str__(self):
-        return f"{self.name} ({self.date.date()})"
+        return f"{self.name} ({self.event_time.date()})"
 
 
 class EventRegistration(models.Model):
